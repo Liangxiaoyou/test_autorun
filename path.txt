@@ -1,0 +1,36 @@
+logon:
+HKLM\\System\\CurrentControlSet\\Control\\Terminal Server\\Wds\\rdpwd\\StartupPrograms				2010/11/21 11:33	
+HKLM\\SYSTEM\\CurrentControlSet\\Control\\SafeBoot\\AlternateShell				
+HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run			~
+HKLM\\SOFTWARE\\Microsoft\\Active Setup\\Installed Components	~
+HKLM\\SOFTWARE\\Wow6432Node\\Microsoft\\Active Setup\\Installed Components		~		2010/11/22 3:26	
+
+services:
+HKLM\\System\\CurrentControlSet\\Services		~too much
+
+drivers:
+HKLM\\System\\CurrentControlSet\\Services		~	
+
+KnownDlls:
+HKLM\\System\\CurrentControlSet\\Control\\Session Manager\\KnownDlls				2019/12/7 17:15	
+
+
+refer to PPT:
+logon:
+HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
+HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer\Run
+HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce
+HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnceEx
+HKLM\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Run
+
+HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
+HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer\Run
+HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce
+HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnceEx
+HKEY_CURRENT_USER\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Run
+
+services:
+HKLM\\System\\CurrentControlSet\\Services
+
+ActiveX:
+HKLM\\SOFTWARE\\Microsoft\\Active Setup\\Installed Components
