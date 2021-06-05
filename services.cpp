@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <tchar.h>
 using namespace std;
+
+TCHAR szSvcName[80];
 //
 // Purpose: 
 //   Retrieves and displays the current service configuration.
@@ -20,7 +22,6 @@ VOID __stdcall DoQuerySvc()
     LPQUERY_SERVICE_CONFIG lpsc; 
     LPSERVICE_DESCRIPTION lpsd;
     DWORD dwBytesNeeded, cbBufSize, dwError; 
-
     // Get a handle to the SCM database. 
  
     schSCManager = OpenSCManager( 
@@ -35,12 +36,12 @@ VOID __stdcall DoQuerySvc()
     }
 
     // Get a handle to the service.
-
+    cout<<"@"<<endl;
     schService = OpenService( 
         schSCManager,          // SCM database 
         szSvcName,             // name of service 
         SERVICE_QUERY_CONFIG); // need query config access 
- 
+    cout<<"@"<<endl;
     if (schService == NULL)
     { 
         printf("OpenService failed (%d)\n", GetLastError()); 
@@ -49,13 +50,14 @@ VOID __stdcall DoQuerySvc()
     }
 
     // Get the configuration information.
- 
+
     if( !QueryServiceConfig( 
         schService, 
         NULL, 
         0, 
         &dwBytesNeeded))
     {
+
         dwError = GetLastError();
         if( ERROR_INSUFFICIENT_BUFFER == dwError )
         {

@@ -9,7 +9,7 @@
 using namespace std;
 
 #define MAX_KEY_LENGTH 255
-#define MAX_VALUE_NAME 32767
+#define MAX_VALUE_NAME 1024
  
 void QueryKey(HKEY hKey) 
 { 
@@ -89,6 +89,7 @@ void QueryKey(HKEY hKey)
         for (i=0, retCode=ERROR_SUCCESS; i<cValues; i++) 
         { 
             cchValue = MAX_VALUE_NAME; 
+            cchData = MAX_VALUE_NAME;
             achValue[0] = '\0';
             achData[0] = '\0';
             //cout<<"@"<<endl;//如果不加这个endl,那么就不会显示打印的结果
@@ -112,7 +113,11 @@ void QueryKey(HKEY hKey)
                     cout<<"lpData is :"<<achData<<"."<<endl;
                     }
             }
-            else cout<<"("<<i+1<<") read key value "<< "error\nerror code is "<<retCode<<endl;
+            else {
+                cout<<"("<<i+1<<") read key value "<< "error\nerror code is "<<retCode<<"\nwe need the achdata size is"<<cchData<<endl;
+                cout<<"\nwe need the achValue size is"<<cchValue<<endl;
+            }
+
         }
     }
 
@@ -121,17 +126,35 @@ void QueryKey(HKEY hKey)
 int __cdecl _tmain()
 {
    HKEY hTestKey;
-   char* path = "SOFTWARE\\Microsoft\\Active Setup\\Installed Components";
-   if( RegOpenKeyEx( HKEY_LOCAL_MACHINE,
-        TEXT(path),
-        0,
-        KEY_READ,
-        &hTestKey) == ERROR_SUCCESS
-      )
-   {
-      QueryKey(hTestKey);
-   }
-   else cout<<"open fail!"<<endl;
+   char* path[5] = {"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+                    "SOFTWARE\\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer\\Run",
+                    "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce",
+                    "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnceEx",
+                    "SOFTWARE\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Run"};
+   for(int i=0;i<5;i++){
+        if( RegOpenKeyEx( HKEY_LOCAL_MACHINE,
+                TEXT(path[i]),
+                0,
+                KEY_READ,
+                &hTestKey) == ERROR_SUCCESS
+            )
+        {
+            QueryKey(hTestKey);
+            RegCloseKey(hTestKey);
+        }
+        else cout<<"open HKML fail!->"<<path[i]<<endl;
+
+        if( RegOpenKeyEx( HKEY_CURRENT_USER,
+                TEXT(path[i]),
+                0,
+                KEY_READ,
+                &hTestKey) == ERROR_SUCCESS
+            )
+        {
+            QueryKey(hTestKey);
+            RegCloseKey(hTestKey);
+        }
+        else cout<<"open HKCU fail!->"<<path[i]<<endl;
+    }
    cout<<"process end"<<endl;
-   RegCloseKey(hTestKey);
 }
