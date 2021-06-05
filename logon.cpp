@@ -1,17 +1,23 @@
 // QueryKey - Enumerates the subkeys of key and its associated values.
 //     hKey - Key whose subkeys and values are to be enumerated.
 
-#include <windows.h>
-#include <stdio.h>
-#include <tchar.h>
-#include <iostream>
+#include "mytable.h"
 
 using namespace std;
 
-#define MAX_KEY_LENGTH 255
-#define MAX_VALUE_NAME 1024
+
+
+void byte2charx(BYTE *a,int size,char* b){
+    int i=0;
+    for(;i<size;i++){
+        b[i] = a[i];
+        //cout<<"a["<<i<<"]="<<a[i]<<endl;
+    }
+    b[i]='\0';
+}
+
  
-void QueryKey(HKEY hKey) 
+void QueryKey(HKEY hKey,mytable *tbl) 
 { 
     TCHAR    achKey[MAX_KEY_LENGTH];   // buffer for subkey name
     DWORD    cbName;                   // size of name string 
@@ -58,6 +64,7 @@ void QueryKey(HKEY hKey)
     printf("cValues is %d\n",cValues);
     cout<<"cValues is "<<cValues<<endl;
     // Enumerate the subkeys, until RegEnumKeyEx fails.
+    /*
     if (cSubKeys)
     {
         printf( "\nNumber of subkeys: %d\n", cSubKeys);
@@ -80,7 +87,7 @@ void QueryKey(HKEY hKey)
             }
         }
     } 
-    
+    */
     // Enumerate the key values. 
     if (cValues) 
     {
@@ -111,6 +118,13 @@ void QueryKey(HKEY hKey)
                 else {
                     cout<<"achdata type is "<<type<<endl;
                     cout<<"lpData is :"<<achData<<"."<<endl;
+                    char* result;
+                    result = new char[cchData];
+                    cout<<"@1"<<endl;
+                    byte2charx(achData,cchData,result);
+                    cout<<"result is "<<result<<endl;
+
+                    tbl->appendRow(achValue,"",result,"","");
                     }
             }
             else {
@@ -123,15 +137,16 @@ void QueryKey(HKEY hKey)
 
 }
 
-int __cdecl _tmain()
+int main()
 {
-   HKEY hTestKey;
-   char* path[5] = {"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
-                    "SOFTWARE\\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer\\Run",
+    mytable tbl;
+    HKEY hTestKey;
+    char* path[5] = {"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+                    "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer\\Run",
                     "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce",
                     "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnceEx",
                     "SOFTWARE\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Run"};
-   for(int i=0;i<5;i++){
+    for(int i=0;i<5;i++){
         if( RegOpenKeyEx( HKEY_LOCAL_MACHINE,
                 TEXT(path[i]),
                 0,
@@ -139,7 +154,7 @@ int __cdecl _tmain()
                 &hTestKey) == ERROR_SUCCESS
             )
         {
-            QueryKey(hTestKey);
+            QueryKey(hTestKey,&tbl);
             RegCloseKey(hTestKey);
         }
         else cout<<"open HKML fail!->"<<path[i]<<endl;
@@ -151,10 +166,11 @@ int __cdecl _tmain()
                 &hTestKey) == ERROR_SUCCESS
             )
         {
-            QueryKey(hTestKey);
+            QueryKey(hTestKey,&tbl);
             RegCloseKey(hTestKey);
         }
         else cout<<"open HKCU fail!->"<<path[i]<<endl;
     }
+    tbl.printTable();
    cout<<"process end"<<endl;
 }
