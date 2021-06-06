@@ -2,7 +2,9 @@
 //     hKey - Key whose subkeys and values are to be enumerated.
 
 #include "mytable.h"
-
+#include "fileDescription.h"
+#include "timeStamp.h"
+#include "string.h"
 using namespace std;
 
 
@@ -43,6 +45,10 @@ void QueryKey(HKEY hKey,mytable *tbl)
     BYTE  achData[MAX_VALUE_NAME];
     DWORD cchData = MAX_VALUE_NAME;
     DWORD type;
+
+    HANDLE     hFile;
+    FILETIME *lpLastWriteTime;
+    SYSTEMTIME  *lpSystemTime;
     // Get the class name and the value count. 
     retCode = RegQueryInfoKey(
         hKey,                    // key handle 
@@ -59,10 +65,10 @@ void QueryKey(HKEY hKey,mytable *tbl)
         &cbMaxValueData,         // longest value data 
         &cbSecurityDescriptor,   // security descriptor 
         &ftLastWriteTime);       // last write time 
-    cout<<"cSubKeys is "<<cSubKeys<<endl;
-    printf("cSubKeys is %d\n",cSubKeys);
-    printf("cValues is %d\n",cValues);
-    cout<<"cValues is "<<cValues<<endl;
+    // cout<<"cSubKeys is "<<cSubKeys<<endl;
+    // printf("cSubKeys is %d\n",cSubKeys);
+    // printf("cValues is %d\n",cValues);
+    // cout<<"cValues is "<<cValues<<endl;
     // Enumerate the subkeys, until RegEnumKeyEx fails.
     /*
     if (cSubKeys)
@@ -116,16 +122,31 @@ void QueryKey(HKEY hKey,mytable *tbl)
                 _tprintf(TEXT("(%d) %s\n"), i+1, achValue); 
                 if(achData == NULL) cout<<"lpData is NULL\n";
                 else {
-                    cout<<"achdata type is "<<type<<endl;
+                    //cout<<"achdata type is "<<type<<endl;
                     cout<<"lpData is :"<<achData<<"."<<endl;
-                    char* result;
-                    result = new char[cchData];
-                    cout<<"@1"<<endl;
-                    byte2charx(achData,cchData,result);
-                    cout<<"result is "<<result<<endl;
+                    char* path;
+                    path= new char[cchData];
+                    char description[MAX_VALUE_NAME];
+                    char publisher[MAX_VALUE_NAME];
+                    char timestamp[MAX_VALUE_NAME];
+                    byte2charx(achData,cchData,path);
+                    //cout<<"result is "<<result<<endl;
+                    //标准化路径
+                    char spath[MAX_VALUE_NAME];
+                    getPath(path,spath);
 
-                    tbl->appendRow(achValue,"",result,"","");
-                    }
+                    //获取文件的描述和发布者
+                    get_file_info(spath,"FileDescription",description);
+                    cout<<"the item description is"<<description<<endl;
+                    get_file_info(spath,"CompanyName",publisher);
+                    //获取文件的时间戳
+                    get_time_stamp(spath,timestamp);
+                    tbl->appendRow(achValue,description,spath,publisher,timestamp);
+
+                    
+
+                    
+                }
             }
             else {
                 cout<<"("<<i+1<<") read key value "<< "error\nerror code is "<<retCode<<"\nwe need the achdata size is"<<cchData<<endl;
